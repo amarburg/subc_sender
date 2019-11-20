@@ -43,18 +43,36 @@ class CamSender:
             totalsent = totalsent + sent
 
     def receive( self ):
-        return ""
 
+        if self.fake:
+            return ""
 
+        lenmsg = self.sock.recv(4)
+        if lenmsg == b'':
+            raise RuntimeError("socket connection broken")
 
-left_cam = CamSender( ipaddress.ip_address('192.168.13.200'), fake=True )
-right_cam = CamSender( ipaddress.ip_address('192.168.13.201'), fake=True )
+        msglen = struct.unpack()
+
+        chunks = []
+        bytes_recd = 0
+        while bytes_recd < MSGLEN:
+            chunk = self.sock.recv(min(MSGLEN - bytes_recd, 2048))
+            if chunk == b'':
+                raise RuntimeError("socket connection broken")
+            chunks.append(chunk)
+            bytes_recd = bytes_recd + len(chunk)
+        return b''.join(chunks)
+
 
 parser = argparse.ArgumentParser(description="Send SubC script to cameras")
 
 parser.add_argument("script", help="Script to send to cameras" )
+parser.add_argument("--fake", action='store_true', help="Don't actually connect to cameras" )
 
 args = parser.parse_args()
+
+left_cam = CamSender( ipaddress.ip_address('192.168.13.234'), fake=args.fake )
+right_cam = CamSender( ipaddress.ip_address('192.168.13.233'), fake=True )
 
 print("Sending script %s" % args.script )
 
@@ -66,3 +84,7 @@ with open(args.script) as fp:
 
         left_cam.connect()
         left_cam.send( line )
+
+        response = left_cam.receive()
+
+        print("Response: %s" % left_cam)
