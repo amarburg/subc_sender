@@ -22,13 +22,13 @@ class CamSender:
 
     def connect(self):
         if not self.fake:
-            self.sock.connect( (host,port) )
+            self.sock.connect( (str(self.host), self.port) )
 
     def send( self, msg ):
         ## Message starts with four (little-endian) message length bytes
         outbuffer = struct.pack('<I', len(msg)) + msg.encode('ascii')
 
-        print(binascii.hexlify(outbuffer).decode('utf-8'))
+        print(binascii.hexlify(outbuffer).decode('ascii'))
 
         if self.fake:
             return
@@ -51,12 +51,20 @@ class CamSender:
         if lenmsg == b'':
             raise RuntimeError("socket connection broken")
 
-        msglen = struct.unpack()
+        print(binascii.hexlify(lenmsg).decode('ascii'))
+
+        a = struct.unpack('<I', lenmsg )
+        msglen = a[0]
+
+        if msglen > 256:
+            raise RuntimeError("Unexpected msg length %d" % msglen)
+
+        print("Waiting for %d bytes" % msglen)
 
         chunks = []
         bytes_recd = 0
-        while bytes_recd < MSGLEN:
-            chunk = self.sock.recv(min(MSGLEN - bytes_recd, 2048))
+        while bytes_recd < msglen:
+            chunk = self.sock.recv(min(msglen - bytes_recd, 2048))
             if chunk == b'':
                 raise RuntimeError("socket connection broken")
             chunks.append(chunk)
@@ -76,15 +84,21 @@ right_cam = CamSender( ipaddress.ip_address('192.168.13.233'), fake=True )
 
 print("Sending script %s" % args.script )
 
-with open(args.script) as fp:
+left_cam.connect()
 
-    for n,line in enumerate(fp):
-        line = line.rstrip()
-        print("Line %d: %s" % (n,line))
+while True:
+    resp = left_cam.receive()
+    response = resp.decode('ascii')
+    print("Response: %s" % response )
 
-        left_cam.connect()
-        left_cam.send( line )
 
-        response = left_cam.receive()
-
-        print("Response: %s" % left_cam)
+#
+# with open(args.script) as fp:
+#
+#     for n,line in enumerate(fp):
+#         line = line.rstrip()
+#         print("Line %d: %s" % (n,line))
+#
+#         left_cam.connect()
+#         #left_cam.send( line )
+#
