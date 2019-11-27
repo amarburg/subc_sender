@@ -82,12 +82,13 @@ parser.add_argument("--not-right", action='store_true', help="Don't send to righ
 
 args = parser.parse_args()
 
-left_cam = CamSender( ipaddress.ip_address('192.168.13.234') )
-right_cam = CamSender( ipaddress.ip_address('127.0.0.1'), port=8889 )
+left_cam = CamSender( ipaddress.ip_address('192.168.13.228') )
+right_cam = CamSender( ipaddress.ip_address('192.168.13.234') )
 
 print("Sending script %s" % args.script )
 
 left_cam.connect()
+right_cam.connect()
 
 
 with open(args.script) as fp:
@@ -96,10 +97,14 @@ with open(args.script) as fp:
         line = line.rstrip()
         #print("Line %d: %s" % (n,line))
 
+        #if not args.not_left:
         left_cam.send(line)
+            #resp = left_cam.receive()
+            #print("LEFT : %-40s|%-40s" % (line,resp.decode('ascii') ) )
 
-        resp = left_cam.receive()
 
-
-
-        print("LEFT : %-40s|%-40s" % (line,resp.decode('ascii') ) )
+        ## Need to make this asynchronous...
+        #if not args.not_right:
+        right_cam.send(line)
+            #resp = right_cam.receive()
+            #print("RIGHT: %-40s|%-40s" % (line,resp.decode('ascii') ) )
