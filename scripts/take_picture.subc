@@ -1,3 +1,9 @@
+ImageFormat:RawSensor
+ManualFocus
+UpdateFocus:2.2
+Iso:50
+ShutterSpeed:8000000
+FocusDistance
 GetVideoLog
 CanTakePicture
 TakePicture
