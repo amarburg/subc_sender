@@ -1,0 +1,11 @@
+SetDevice:0,Aquorea Mk3
+SetBaud:0,115200
+SetStandard:0,RS485
+GetStatus:0
+GetStatus:1
+GetStatus:2
+GetStatus:3
+ExpansionState
+On:0
+GetHostName
+GetHostName

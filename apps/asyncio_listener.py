@@ -8,6 +8,8 @@ import socket
 
 import asyncio
 
+from datetime import datetime
+
 class CamConfig:
 
     # 888 is the default port for the SubC Camera interface
@@ -104,7 +106,9 @@ async def camera_listener( cam ):
 
         resp = b''.join(chunks)
         response = resp.decode('ascii')
-        print("% 5s (%3d): %s" % (cam.name, msglen, response) )
+
+        now = datetime.now().strftime("%H:%M:%S")
+        print("% 9s | % 5s (%3d): %s" % (now, cam.name, msglen, response) )
 
 
 parser = argparse.ArgumentParser(description="Send SubC script to cameras")
