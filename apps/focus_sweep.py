@@ -10,6 +10,8 @@ from os import path
 from datetime import datetime,timedelta
 from time import sleep
 
+import numpy as np
+
 
 parser = configargparse.ArgumentParser(description="Send SubC script to cameras",
                                         default_config_files=["subc_conf.yaml"])
@@ -21,11 +23,11 @@ parser.add_argument("--right-ip", default='192.168.13.234', help="IP address for
 parser.add_argument("--pre-script", default="scripts/picture_setup_iso50.subc", help="Script to run before taking pictures")
 parser.add_argument("--post-script", default=None, help="Script to run after taking pictures")
 
-parser.add_argument("--repeat", default=None, type=int, help="Number of times to" )
-parser.add_argument("--pause", default=5, type=int, help="Pause between images" )
+parser.add_argument("--pause", default=3, type=int, help="Pause between images" )
 
-
-
+parser.add_argument("--focus-start", type=float, help="Minimum focus distance")
+parser.add_argument("--focus-stop", type=float, help="Maximum focus distance")
+parser.add_argument("--focus-step", type=float, help="Step in focus distance")
 
 args = parser.parse_args()
 
@@ -49,20 +51,22 @@ if args.pre_script:
     with open(args.pre_script) as fp:
         subc_cam.send( fp, cameras=cameras )
 
-repeat = args.repeat or 1
-if repeat < 0:
-    repeat = 32767
 
-for i in range(0,repeat):
+foci = np.arange( args.focus_start, args.focus_stop, args.focus_step )
+
+for focus in foci:
+
     now = datetime.now()
     picture_at = now+timedelta(seconds=2)
 
     #print(picture_at.strftime("%H:%M:%S"))
 
-    cmds = ["TakePicture:%s" % picture_at.strftime("%H:%M:%S")]
+    cmds = ["UpdateFocus:%.1f" % focus,
+            "TakePicture:%s" % picture_at.strftime("%H:%M:%S")]
+
     subc_cam.send( cmds, cameras=cameras )
 
-    if i < (repeat-1):
+    if focus != foci[-1]:
         print("Sleep until %s" % (datetime.now()+timedelta(seconds=args.pause)).strftime("%H:%M:%S") )
         sleep( args.pause )
 

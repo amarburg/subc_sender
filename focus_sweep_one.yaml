@@ -1,0 +1,5 @@
+pre-script: scripts/picture_setup_iso50.subc
+
+focus-start: 1.5
+focus-stop: 2.5
+focus-step: 0.2
