@@ -2,9 +2,6 @@ Device:0,Aquorea Mk3
 On:0
 ImageFormat:RawSensor
 UpdateFocus:2.2
-Iso:50
-ShutterSpeed:8000000
+Iso:100
+ShutterSpeed:4000000
 FocusDistance
-GetVideoLog
-CanTakePicture
-TakePicture

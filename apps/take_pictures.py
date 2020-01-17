@@ -18,7 +18,7 @@ parser.add('-c', '--my-config', is_config_file=True, help='config file path')
 parser.add_argument("--left-ip", default='192.168.13.228', help="IP address for left camera" )
 parser.add_argument("--right-ip", default='192.168.13.234', help="IP address for right camera" )
 
-parser.add_argument("--pre-script", default=None, help="Script to run before taking pictures")
+parser.add_argument("--pre-script", default="scripts/picture_setup_iso50.subc", help="Script to run before taking pictures")
 parser.add_argument("--post-script", default=None, help="Script to run before taking pictures")
 
 parser.add_argument("--repeat", default=None, type=int, help="Number of times to" )
@@ -57,7 +57,7 @@ for i in range(0,repeat):
     now = datetime.now()
     picture_at = now+timedelta(seconds=2)
 
-    print(picture_at.strftime("%H:%M:%S"))
+    #print(picture_at.strftime("%H:%M:%S"))
 
     cmds = ["TakePicture:%s" % picture_at.strftime("%H:%M:%S")]
     subc_cam.send( cmds, cameras=cameras )
