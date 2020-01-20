@@ -40,7 +40,6 @@ async def camera_simulator(reader, writer):
 
         await asyncio.sleep(1)
 
-
     print("Closing the connection")
     writer.close()
 
@@ -54,4 +53,5 @@ async def main( port=8888 ):
     async with server:
         await server.serve_forever()
 
-asyncio.run(main(args.port))
+if __name__=="__main__":
+    asyncio.run(main(args.port))

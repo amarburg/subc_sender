@@ -41,3 +41,11 @@ async def camera_listener( cam ):
 
         now = datetime.now().strftime("%H:%M:%S")
         print("% 9s | % 5s (%3d) >> %s" % (now, cam.name, msglen, response) )
+
+async def listen( cameras ):
+
+    tasks = [asyncio.create_task( camera_listener(cam) ) for cam in cameras]
+
+    ## Now what?
+    while True:
+        await asyncio.gather(*tasks)
