@@ -1,1 +1,1 @@
-pre-script: scripts/default_pre_pictures.subc
+pre-script: scripts/camera_setup_iso50.subc

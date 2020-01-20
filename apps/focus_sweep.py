@@ -23,7 +23,8 @@ parser.add_argument("--right-ip", default='192.168.13.234', help="IP address for
 parser.add_argument("--pre-script", default="scripts/picture_setup_iso50.subc", help="Script to run before taking pictures")
 parser.add_argument("--post-script", default=None, help="Script to run after taking pictures")
 
-parser.add_argument("--pause", default=3, type=int, help="Pause between images" )
+parser.add_argument("--pause", default=2, type=int, help="Pause between images" )
+parser.add_argument("--delay", default=3, type=int, help="Number of seconds to delay before taking picture" )
 
 parser.add_argument("--focus-start", type=float, help="Minimum focus distance")
 parser.add_argument("--focus-stop", type=float, help="Maximum focus distance")
@@ -56,18 +57,31 @@ foci = np.arange( args.focus_start, args.focus_stop, args.focus_step )
 
 for focus in foci:
 
-    now = datetime.now()
-    picture_at = now+timedelta(seconds=2)
-
     #print(picture_at.strftime("%H:%M:%S"))
 
-    cmds = ["UpdateFocus:%.1f" % focus,
-            "TakePicture:%s" % picture_at.strftime("%H:%M:%S")]
+    cmds = ["FocusDistance",
+            "UpdateFocus:%.1f" % focus]
+    subc_cam.send( cmds, cameras=cameras )
 
+    sleep(1)
+
+    now = datetime.now()
+    picture_at = now+timedelta(seconds=args.delay)
+
+    # cmds = [ ]
+    # subc_cam.send( cmds, cameras=cameras )
+
+    left_cam.send("TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f"))
+    right_cam.send("TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f"))
+
+    sleep( args.delay )
+
+    cmds = ["FocusDistance"]
     subc_cam.send( cmds, cameras=cameras )
 
     if focus != foci[-1]:
-        print("Sleep until %s" % (datetime.now()+timedelta(seconds=args.pause)).strftime("%H:%M:%S") )
+
+        print("Sleep until %s" % (picture_at+timedelta(seconds=args.pause)).strftime("%H:%M:%S") )
         sleep( args.pause )
 
 

@@ -1,0 +1,13 @@
+SyncClock
+Device:0,Aquorea Mk3
+LampBrightness:0
+ImageFormat:RawSensor
+WhiteBalance:Manual
+R:2.2
+G:1.0
+B:1.7
+Exposure:Manual
+Iso:50
+StrobeIso:50
+ShutterSpeed:8000000
+StrobeShutter:8000000
