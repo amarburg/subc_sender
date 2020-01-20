@@ -30,13 +30,12 @@ if __name__=="__main__":
     cam_config.addDefaultArgs( parser )
 
     parser.add_argument("script", help="Script to send to cameras" )
-    parser.add_argument("--wait", action="store_true" )
+    parser.add_argument("--wait", action="store_true", help="Don't quit immediately, continue to listen to cameras" )
     args = parser.parse_args()
 
-    left_cam = cam_config.CamConfig( ipaddress.ip_address(args.left_ip), port=args.left_port, name="LEFT" )
-    right_cam = cam_config.CamConfig( ipaddress.ip_address(args.right_ip), port=args.right_port, name="RIGHT" )
+    cameras = cam_config.camsFromArgs( args )
 
     print("Sending script %s" % args.script )
 
     with open(args.script) as fp:
-        asyncio.run(send( fp, cams=[left_cam,right_cam], wait=args.wait ))
+        asyncio.run(send( fp, cams=cameras, wait=args.wait ))
