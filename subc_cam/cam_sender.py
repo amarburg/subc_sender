@@ -5,7 +5,7 @@ from datetime import datetime
 
 import asyncio
 
-class CamSender:
+class CamSocket:
 
     # 888 is the default port for the SubC Camera interface
     def __init__(self, cam):
@@ -19,8 +19,8 @@ class CamSender:
 
     async def send( self, msg ):
 
-        now = datetime.now().strftime("%H:%M:%S")
-        print("% 9s | % 5s (%3d) << %s" % (now, self.cam.name, len(msg), msg) )
+        now = datetime.now().strftime("%H:%M:%S.%f")
+        print("% 9s | % 5s (%3d) <--- %s" % (now, self.cam.name, len(msg), msg) )
 
         ## Message starts with four (little-endian) message length bytes
         outbuffer = struct.pack('<I', len(msg)) + msg.encode('ascii')
@@ -70,15 +70,27 @@ class CamSender:
 
 
 
-async def send( fp, cameras=[] ):
+class CamSender:
 
-    senders = [CamSender(cam) for cam in cameras]
+    def __init__( self, cameras=[] ):
+        self.senders = [CamSocket(cam) for cam in cameras]
 
-    await asyncio.sleep(1)
+    async def send( self, fp ):
+        for n,line in enumerate(fp):
+            line = line.rstrip()
 
-    for n,line in enumerate(fp):
-        line = line.rstrip()
-        #print("Sending %d: %s" % (n,line))
+            for sender in self.senders:
+                await sender.send(line)
 
-        for sender in senders:
-            await sender.send(line)
+# async def send( fp, cameras=[] ):
+#
+#     senders = [CamSocket(cam) for cam in cameras]
+#
+#     await asyncio.sleep(1)
+#
+#     for n,line in enumerate(fp):
+#         line = line.rstrip()
+#         #print("Sending %d: %s" % (n,line))
+#
+#         for sender in senders:
+#             await sender.send(line)

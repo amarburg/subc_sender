@@ -8,18 +8,18 @@ import socket
 
 import asyncio
 
-from subc_cam import cam_config, cam_sender, listener
+from subc_cam import cam_config, cam_sender, cam_listener
 
 async def send( fp, cams, wait = False ):
-    ltask = asyncio.create_task( listener.listen( cams ) )
+    listener = asyncio.create_task( cam_listener.listen( cams ) )
 
     await cam_sender.send( fp, cams )
 
     if not args.wait:
-        ltask.cancel()
+        listener.cancel()
 
     try:
-        await ltask
+        await listener
     except asyncio.CancelledError:
         return
 

@@ -10,10 +10,12 @@ from time import sleep
 
 import asyncio
 
-from subc_cam import cam_config, cam_sender, listener
+from subc_cam import cam_config, cam_sender, cam_listener
 
 async def take_pictures( cams, args ):
-    ltask = asyncio.create_task( listener.listen( cams ) )
+    listener = asyncio.create_task( cam_listener.listen( cams ) )
+
+    sender = cam_sender.CamSender( cams )
 
     if args.pre_script:
         print("Sending pre-script %s" % args.pre_script)
@@ -22,11 +24,11 @@ async def take_pictures( cams, args ):
             exit()
 
         with open(args.pre_script) as fp:
-            await cam_sender.send( fp, cameras=cams )
+            await sender.send( fp )
 
     if args.focus:
-        await cam_sender.send( ["UpdateFocus:%0.1f" % args.focus], cameras=cameras )
-        sleep(1)
+        await sender.send( ["UpdateFocus:%0.1f" % args.focus] )
+        await asyncio.sleep(1)
 
     repeat = args.repeat or 1
     if repeat < 0:
@@ -37,16 +39,16 @@ async def take_pictures( cams, args ):
         picture_at = now+timedelta(seconds=args.delay)
 
         cmds = ["FocusDistance","TakePicture:%s" % picture_at.strftime("%H:%M:%S")]
-        await cam_sender.send( cmds, cameras=cameras )
+        await sender.send( cmds )
 
         #left_cam.send("TakePicture:%s" % (picture_at + timedelta(microseconds=0000)).strftime("%H:%M:%S.%f"))
         #right_cam.send("TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f"))
 
-        sleep(args.delay)
+        await asyncio.sleep(args.delay)
 
         if i < (repeat-1):
             print("Sleep until %s" % (datetime.now()+timedelta(seconds=args.pause)).strftime("%H:%M:%S") )
-            sleep( args.pause )
+            await asyncio.sleep( args.pause )
 
 
 
@@ -56,14 +58,14 @@ async def take_pictures( cams, args ):
             exit()
 
         with open(args.post_script) as fp:
-            await cam_sender.send( fp, cameras=cameras )
+            await sender.send( fp )
 
 
     if not args.wait:
-        ltask.cancel()
+        listener.cancel()
 
     try:
-        await ltask
+        await listener
     except asyncio.CancelledError:
         return
 

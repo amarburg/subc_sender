@@ -11,10 +11,11 @@ from time import sleep
 import numpy as np
 
 import asyncio
-from subc_cam import cam_config, cam_sender, listener
+from subc_cam import cam_config, cam_sender, cam_listener
 
 async def focus_sweep( cams, args ):
-    ltask = asyncio.create_task( listener.listen( cams ) )
+    listener = asyncio.create_task( cam_listener.listen( cams ) )
+    sender = cam_sender.CamSender( cams )
 
     if args.pre_script:
         if not path.exists(args.pre_script):
@@ -22,7 +23,7 @@ async def focus_sweep( cams, args ):
             exit()
 
         with open(args.pre_script) as fp:
-            await cam_sender.send( fp, cameras=cameras )
+            await sender.send( fp )
 
 
     foci = np.arange( args.focus_start, args.focus_stop, args.focus_step )
@@ -33,7 +34,7 @@ async def focus_sweep( cams, args ):
 
         cmds = ["FocusDistance",
                 "UpdateFocus:%.1f" % focus]
-        await cam_sender.send( cmds, cameras=cameras )
+        await sender.send( cmds )
 
         await asyncio.sleep(1)
 
@@ -43,12 +44,12 @@ async def focus_sweep( cams, args ):
         # cmds = [ ]
         # subc_cam.send( cmds, cameras=cameras )
 
-        await cam_sender.send( ["TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f")], cameras=cameras )
+        await sender.send( ["TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f")] )
 
         await asyncio.sleep( args.delay )
 
         cmds = ["FocusDistance"]
-        await cam_sender.send( cmds, cameras=cameras )
+        await sender.send( cmds )
 
         if focus != foci[-1]:
 
@@ -63,14 +64,14 @@ async def focus_sweep( cams, args ):
             exit()
 
         with open(args.post_script) as fp:
-            await cam_sender.send( fp, cameras=cameras )
+            await sender.send( fp )
 
 
     if not args.wait:
-        ltask.cancel()
+        listener.cancel()
 
     try:
-        await ltask
+        await listener
     except asyncio.CancelledError:
         return
 

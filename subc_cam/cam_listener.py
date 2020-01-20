@@ -39,8 +39,8 @@ async def camera_listener( cam ):
         resp = b''.join(chunks)
         response = resp.decode('ascii')
 
-        now = datetime.now().strftime("%H:%M:%S")
-        print("% 9s | % 5s (%3d) >> %s" % (now, cam.name, msglen, response) )
+        now = datetime.now().strftime("%H:%M:%S.%f")
+        print("% 9s | % 5s (%3d) ---> %s" % (now, cam.name, msglen, response) )
 
 async def listen( cameras ):
 
