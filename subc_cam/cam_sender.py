@@ -10,7 +10,7 @@ class CamSocket:
     # 888 is the default port for the SubC Camera interface
     def __init__(self, cam):
         self.cam = cam
-        self.sock = socket.socket(  socket.AF_INET, socket.SOCK_STREAM)
+        self.sock = socket.socket(  socket.AF_INET, socket.SOCK_STREAM )
         self.connect()
 
     def connect(self):

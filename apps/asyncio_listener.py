@@ -10,7 +10,7 @@ import asyncio
 
 from datetime import datetime
 
-from subc_cam import cam_config, listener
+from subc_cam import cam_config, cam_listener
 
 if __name__=="__main__":
 
@@ -23,4 +23,4 @@ if __name__=="__main__":
     left_cam = cam_config.CamConfig( ipaddress.ip_address(args.left_ip), port=args.left_port, name="LEFT" )
     right_cam = cam_config.CamConfig( ipaddress.ip_address(args.right_ip), port=args.right_port, name="RIGHT" )
 
-    asyncio.run( listener.listen( [left_cam, right_cam] ) )
+    asyncio.run( cam_listener.listen( [left_cam, right_cam] ) )

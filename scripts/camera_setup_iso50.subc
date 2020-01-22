@@ -9,5 +9,8 @@ B:1.7
 Exposure:Manual
 Iso:50
 StrobeIso:50
+UpdateShutterSpeed:8000000
 ShutterSpeed:8000000
 StrobeShutter:8000000
+Iso
+ShutterSpeed
