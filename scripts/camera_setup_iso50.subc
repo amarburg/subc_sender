@@ -2,15 +2,20 @@ SyncClock
 Device:0,Aquorea Mk3
 LampBrightness:0
 ImageFormat:RawSensor
+UpdateISO:50
+Iso:50
+ISO:50
 WhiteBalance:Manual
 R:2.2
 G:1.0
 B:1.7
 Exposure:Manual
-Iso:50
-StrobeIso:50
 UpdateShutterSpeed:8000000
 ShutterSpeed:8000000
-StrobeShutter:8000000
+Pause:1
+UpdateShutterSpeed:8000000
+ShutterSpeed:8000000
+Pause:1
 Iso
 ShutterSpeed
+Pause:1

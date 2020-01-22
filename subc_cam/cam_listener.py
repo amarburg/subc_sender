@@ -10,6 +10,7 @@ import asyncio
 
 from datetime import datetime
 
+# \todo Attempt to reopen camera connection if it's dropped...
 async def camera_listener( cam ):
     reader,writer = await asyncio.open_connection( str(cam.host), cam.port )
 

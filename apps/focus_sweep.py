@@ -41,20 +41,14 @@ async def focus_sweep( cams, args ):
         now = datetime.now()
         picture_at = now+timedelta(seconds=args.delay)
 
-        # cmds = [ ]
-        # subc_cam.send( cmds, cameras=cameras )
-
-        await sender.send( ["TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f")] )
-
-        await asyncio.sleep( args.delay )
-
-        cmds = ["FocusDistance"]
+        cmds = ["FocusDistance",
+                "TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f"),
+                "Pause:%d" % (args.delay+arg.pause) ]
         await sender.send( cmds )
 
-        if focus != foci[-1]:
-
-            print("Sleep until %s" % (picture_at+timedelta(seconds=args.pause)).strftime("%H:%M:%S") )
-            await asyncio.sleep( args.pause )
+        # if focus != foci[-1]:
+        #     #print("Sleep until %s" % (picture_at+timedelta(seconds=args.pause)).strftime("%H:%M:%S") )
+        #     await asyncio.sleep( args.pause )
 
 
 
@@ -66,8 +60,8 @@ async def focus_sweep( cams, args ):
         with open(args.post_script) as fp:
             await sender.send( fp )
 
-
     if not args.wait:
+        await asyncio.sleep(5)
         listener.cancel()
 
     try:

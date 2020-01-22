@@ -1,6 +1,7 @@
 import struct
 import binascii
 import socket
+import re
 from datetime import datetime
 
 import asyncio
@@ -78,6 +79,15 @@ class CamSender:
     async def send( self, fp ):
         for n,line in enumerate(fp):
             line = line.rstrip()
+
+            pmatch = re.match(r'pause:(\d+)', line, re.IGNORECASE)
+            if pmatch:
+                p = int( pmatch.group(1) )
+
+                print("Pause %d" % p)
+                await asyncio.sleep(int(p))
+
+                continue
 
             for sender in self.senders:
                 await sender.send(line)

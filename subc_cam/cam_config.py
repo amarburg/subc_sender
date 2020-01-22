@@ -20,9 +20,19 @@ def addDefaultArgs( parser ):
     parser.add_argument("--left-port", type=int, default=8888)
     parser.add_argument("--right-port", type=int, default=8888)
 
+    parser.add_argument("--left-only", action="store_true")
+    parser.add_argument("--right-only", action="store_true")
+
+
+
 def camsFromArgs( args ):
 
-    left_cam = CamConfig( ipaddress.ip_address(args.left_ip), port=args.left_port, name="LEFT" )
-    right_cam = CamConfig( ipaddress.ip_address(args.right_ip), port=args.right_port, name="RIGHT" )
+    cams = []
 
-    return [right_cam,left_cam]
+    if not args.right_only:
+        cams.append( CamConfig( ipaddress.ip_address(args.left_ip), port=args.left_port, name="LEFT" ) )
+
+    if not args.left_only:
+        cams.append( CamConfig( ipaddress.ip_address(args.right_ip), port=args.right_port, name="RIGHT" ) )
+
+    return cams

@@ -13,7 +13,9 @@ from subc_cam import cam_config, cam_sender, cam_listener
 async def send( fp, cams, wait = False ):
     listener = asyncio.create_task( cam_listener.listen( cams ) )
 
-    await cam_sender.send( fp, cams )
+    sender = cam_sender.CamSender( cams )
+
+    await sender.send( fp )
 
     if not args.wait:
         listener.cancel()

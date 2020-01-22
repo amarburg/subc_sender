@@ -27,7 +27,8 @@ async def take_pictures( cams, args ):
             await sender.send( fp )
 
     if args.focus:
-        await sender.send( ["UpdateFocus:%0.1f" % args.focus] )
+        await sender.send( ["UpdateFocus:%0.1f" % args.focus
+                            "Pause:1"] )
         await asyncio.sleep(1)
 
     repeat = args.repeat or 1
@@ -38,7 +39,9 @@ async def take_pictures( cams, args ):
         now = datetime.now()
         picture_at = now+timedelta(seconds=args.delay)
 
-        cmds = ["FocusDistance","TakePicture:%s" % picture_at.strftime("%H:%M:%S")]
+        cmds = ["FocusDistance",
+                "TakePicture:%s" % picture_at.strftime("%H:%M:%S"),
+                "Pause:%d" % (args.delay+1)]
         await sender.send( cmds )
 
         #left_cam.send("TakePicture:%s" % (picture_at + timedelta(microseconds=0000)).strftime("%H:%M:%S.%f"))
@@ -48,11 +51,12 @@ async def take_pictures( cams, args ):
 
         if i < (repeat-1):
             print("Sleep until %s" % (datetime.now()+timedelta(seconds=args.pause)).strftime("%H:%M:%S") )
-            await asyncio.sleep( args.pause )
+            #await asyncio.sleep( args.pause )
 
 
 
     if args.post_script:
+        #await asyncio.sleep(5)
         if not path.exists(args.post_script):
             print("Post-script %s does not exist" % args.post_script)
             exit()
@@ -60,8 +64,8 @@ async def take_pictures( cams, args ):
         with open(args.post_script) as fp:
             await sender.send( fp )
 
-
     if not args.wait:
+        await asyncio.sleep(5)
         listener.cancel()
 
     try:
