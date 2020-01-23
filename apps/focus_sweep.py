@@ -28,11 +28,14 @@ async def focus_sweep( cams, args ):
 
     foci = np.arange( args.focus_start, args.focus_stop, args.focus_step )
 
+#    for focus in [0.1, 0.2, 0.3, 0.5, 0.7, 0.9]:
     for focus in foci:
 
         #print(picture_at.strftime("%H:%M:%S"))
 
         cmds = ["FocusDistance",
+                "Iso",
+                "ShutterSpeed",
                 "UpdateFocus:%.1f" % focus]
         await sender.send( cmds )
 
@@ -43,7 +46,7 @@ async def focus_sweep( cams, args ):
 
         cmds = ["FocusDistance",
                 "TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f"),
-                "Pause:%d" % (args.delay+arg.pause) ]
+                "Pause:%d" % (args.delay+args.pause) ]
         await sender.send( cmds )
 
         # if focus != foci[-1]:
@@ -80,7 +83,7 @@ if __name__=="__main__":
     parser.add_argument("--pre-script", default="scripts/camera_setup_iso50.subc", help="Script to run before taking pictures")
     parser.add_argument("--post-script", default=None, help="Script to run after taking pictures")
 
-    parser.add_argument("--delay", default=3, type=int, help="Number of seconds to delay before taking picture" )
+    parser.add_argument("--delay", default=2, type=int, help="Number of seconds to delay before taking picture" )
     parser.add_argument("--pause", default=5, type=int, help="Pause between images" )
 
     parser.add_argument("--wait", action="store_true", help="Don't quit immediately, continue to listen to cameras" )

@@ -27,7 +27,7 @@ async def take_pictures( cams, args ):
             await sender.send( fp )
 
     if args.focus:
-        await sender.send( ["UpdateFocus:%0.1f" % args.focus
+        await sender.send( ["UpdateFocus:%0.1f" % args.focus,
                             "Pause:1"] )
         await asyncio.sleep(1)
 
@@ -40,7 +40,7 @@ async def take_pictures( cams, args ):
         picture_at = now+timedelta(seconds=args.delay)
 
         cmds = ["FocusDistance",
-                "TakePicture:%s" % picture_at.strftime("%H:%M:%S"),
+                "TakePicture:%s" % picture_at.strftime("%H:%M:%S.%f"),
                 "Pause:%d" % (args.delay+1)]
         await sender.send( cmds )
 
