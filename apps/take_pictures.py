@@ -83,7 +83,7 @@ if __name__=="__main__":
 
     cam_config.addDefaultArgs( parser )
 
-    parser.add_argument("--pre-script", default="scripts/camera_setup_iso50.subc", help="Script to run before taking pictures")
+    parser.add_argument("--pre-script", default="subc_scripts/camera_setup_iso50.subc", help="Script to run before taking pictures")
     parser.add_argument("--post-script", default=None, help="Script to run after taking pictures")
 
     parser.add_argument("--focus", default=None, type=float, help="Focus value to send to camera" )
