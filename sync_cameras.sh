@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DEST_DIR=/zvol1/aaron/subc_sync
+DEST_DIR=/home/sysop/aaron/camera_data
 
 mkdir $DEST_DIR/left $DEST_DIR/right
 
