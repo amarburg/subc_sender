@@ -8,7 +8,7 @@ import asyncio
 
 class CamSocket:
 
-    # 888 is the default port for the SubC Camera interface
+    # 8888 is the default port for the SubC Camera interface
     def __init__(self, cam):
         self.cam = cam
         self.sock = socket.socket(  socket.AF_INET, socket.SOCK_STREAM )
@@ -74,7 +74,7 @@ class CamSocket:
 class CamSender:
 
     def __init__( self, cameras=[] ):
-        self.senders = [CamSocket(cam) for cam in cameras]
+        self.sockets = [CamSocket(cam) for cam in cameras]
 
     async def send( self, fp ):
         for n,line in enumerate(fp):
@@ -89,8 +89,8 @@ class CamSender:
 
                 continue
 
-            for sender in self.senders:
-                await sender.send(line)
+            for socket in self.sockets:
+                await socket.send(line)
 
 # async def send( fp, cameras=[] ):
 #
