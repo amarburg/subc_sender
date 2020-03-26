@@ -34,7 +34,7 @@ if __name__=="__main__":
     cam_config.addDefaultArgs( parser )
 
     parser.add_argument("script", nargs="*", help="Script to send to cameras, use \"--\" for stdin" )
-    parser.add_argument("-i,--stdin", help="Send from stdin", action="store_true", dest="stdin")
+    parser.add_argument('-i','--stdin', help="Send from stdin", action="store_true", dest="stdin")
     parser.add_argument("--wait", action="store_true", help="Don't quit immediately, continue to listen to cameras" )
     args = parser.parse_args()
 
