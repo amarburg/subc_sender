@@ -1,0 +1,8 @@
+ConnectNTPServer:192.168.13.5
+SyncClock
+SyncClock 
+AutoTime
+NTPServerAddress
+NTPCOnnectionStatus
+NTPClockDrift
+

@@ -9,3 +9,11 @@ ExpansionState
 On:0
 GetHostName
 GetHostName
+AutoTime:True
+NTPClockDrift
+NTPConnectionStatus
+SystemDateTime
+SystemTimeZone
+SyncClock
+SyncClock
+SyncClock

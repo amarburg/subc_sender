@@ -1,8 +1,7 @@
 SyncClock
 Device:0,Aquorea Mk3
 On:0
-LampBrightness:1
-EnableStrobe
+LampBrightness:100
 ImageFormat:RawSensor
 ManualExposure
 Pause:1
@@ -13,11 +12,7 @@ UpdateB:1.7
 Pause:1
 UpdateISO:50
 UpdateShutterSpeed:16666667
-Compensate:0
 Pause:1
 ISO
 ShutterSpeed
-StrobeISO
-StrobeShutter
-ExposureStops
 Pause:1
