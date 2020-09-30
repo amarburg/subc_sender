@@ -1,4 +1,5 @@
-LampBrightness:1
+SetLampBrightness:0
+LampOff
 Pause:1
 Off:0
 Off:1
