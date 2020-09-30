@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import time
 import boto3
 from botocore.exceptions import ClientError
@@ -8,6 +9,7 @@ import logging
 from tempfile import TemporaryDirectory
 import subprocess
 import re
+import shutil
 
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -21,7 +23,9 @@ right_path = Path("/mnt/right_camera/Stills")
 
 def dng_to_png( dngpath, pngpath ):
 
-    cmd = ["convert", dngpath, pngpath]
+    #cmd = ["convert", dngpath, pngpath]
+
+    cmd = ["rawtherapee-cli", "-s", "-b8", "-n", "-Y", "-c", dngpath, "-o", pngpath ]
     logging.debug(cmd)
 
     convert_out = subprocess.run(cmd, capture_output=True)
@@ -33,6 +37,47 @@ def subc_file_to_datetime( filename ):
 
     return datetime.strptime(filename, "%Y.%m.%d %H.%M.%S.%f.dng")
 
+def wait_until_readable( fname, timeout=10 ):
+    if timeout < 0:
+        return false
+
+    for x in range(0,timeout):
+        if os.access(fname, os.R_OK):
+            break
+
+        logging.debug("Can't read, waiting...")
+        time.sleep(1)
+
+    return os.access(fname, os.R_OK)
+
+
+def convert_and_upload( file, label ):
+
+    #with TemporaryDirectory() as td:
+
+    dngfile = Path("/tmp") / Path(file.name)
+    logging.debug("Copying %s to %s" % (file,dngfile))
+
+    cmd = ["cp", file, dngfile ]
+    subprocess.run(cmd)
+
+    pngfile = dngfile.with_suffix(".png")
+
+    dng_to_png( dngfile, pngfile )
+
+    # Upload the file
+    s3_client = boto3.client('s3',endpoint_url = 'https://s3.us-west-1.wasabisys.com')
+    bucket = "nasa-invader-subc-cameras"
+    object_name = Path(label) / pngfile.name
+
+    try:
+        response = s3_client.upload_file( str(pngfile), bucket, str(object_name) )
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+
+
 class ImagePair:
 
     def __init__(self,left):
@@ -40,8 +85,6 @@ class ImagePair:
         self.right = None
 
 class SubcEventHandler( FileSystemEventHandler ):
-
-
 
     def on_created(self, event):
         super(SubcEventHandler, self).on_created(event)
@@ -64,7 +107,6 @@ class SubcEventHandler( FileSystemEventHandler ):
         pair = ImagePair(newfile)
 
         for right_file in right_files:
-            logging.debug(right_file)
 
             right_date = subc_file_to_datetime( right_file )
 
@@ -78,33 +120,17 @@ class SubcEventHandler( FileSystemEventHandler ):
             logging.error( "Did not find matching right file")
 
 
-
-        def convert_and_upload( file, label ):
-
-            #with TemporaryDirectory() as td:
-
-            dngfile = Path("/tmp") / Path(file.name)
-            shutil.copy( file, dngfile )
-
-            pngfile = dngfile.with_suffix(".png")
-
-            dng_to_png( dngfile, pngfile )
-
-            # Upload the file
-            s3_client = boto3.client('s3')
-            bucket = "nasa-invader-subc-cameras"
-            object_name = Path(label) / pngfile.name
-
-            try:
-                response = s3_client.upload_file( str(pngfile), bucket, str(object_name) )
-            except ClientError as e:
-                logging.error(e)
-                return False
-            return True
-
+        if not wait_until_readable( pair.left ):
+            logging.error("Never became readable, skipping...")
+            return
 
         convert_and_upload( pair.left, "left" )
         if pair.right:
+
+            if not wait_until_readable( pair.right ):
+                logging.error("Never became readable, skipping...")
+                return
+
             convert_and_upload( pair.right, "right" )
 
 
