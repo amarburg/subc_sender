@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import configargparse
-
+import logging
 
 import subc_cam
 from os import path
@@ -18,7 +18,7 @@ async def take_pictures( cams, args ):
     sender = cam_sender.CamSender( cams )
 
     if args.pre_script:
-        print("Sending pre-script %s" % args.pre_script)
+        logging.debug("Sending pre-script %s" % args.pre_script)
         if not path.exists(args.pre_script):
             print("Pre-script %s does not exist" % args.pre_script)
             exit()
@@ -57,6 +57,7 @@ async def take_pictures( cams, args ):
 
     if args.post_script:
         #await asyncio.sleep(5)
+        logging.debug("Sending post-script %s" % args.post_script)
         if not path.exists(args.post_script):
             print("Post-script %s does not exist" % args.post_script)
             exit()
@@ -84,7 +85,7 @@ if __name__=="__main__":
     cam_config.addDefaultArgs( parser )
 
     parser.add_argument("--pre-script", default="scripts/camera_setup_iso50.subc", help="Script to run before taking pictures")
-    parser.add_argument("--post-script", default=None, help="Script to run after taking pictures")
+    parser.add_argument("--post-script", default="scripts/lights_off.subc", help="Script to run after taking pictures")
 
     parser.add_argument("--focus", default=None, type=float, help="Focus value to send to camera" )
 
