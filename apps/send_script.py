@@ -51,7 +51,7 @@ if __name__=="__main__":
                 ## Only wait on last script ...
                 ## \todo Probably a much more Pythonic way to do this....
                 wait = args.wait
-                if n < len(args.script):
+                if n < len(args.script)-1:
                     wait = False
 
                 asyncio.run(send( fp, cams=cameras, wait=wait ))
