@@ -1,0 +1,15 @@
+On:0
+On:1
+Pause:1
+AutoDetect
+Pause:15
+GetStatus:0
+Pause:1
+GetStatus:1
+Pause:1
+GetStatus:2
+Pause:1
+GetStatus:3
+Pause:1
+GetProductSerialNumber
+Pause:1

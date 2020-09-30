@@ -1,23 +1,27 @@
 SyncClock
-Device:1,Aquorea Mk3
-On:0
+Pause:1
 On:1
+Device:1,Aquorea Mk3
+Pause:1
 DisableStrobe
 LampOn
+ProductState
+Pause:1
 SetLampBrightness:100
 ImageFormat:RawSensor
 ManualExposure
+ManualFocus
+WhiteBalance
 Pause:1
 UpdateWhiteBalance:Manual
 UpdateR:2.2
 UpdateG:1.0
-UpdateB:1.7
+UpdateB:1.5
 Pause:1
 UpdateISO:100
-UpdateShutterSpeed:8000000
-Compensate:0
+UpdateShutterSpeed:16666667
+UpdateFocus:15
 Pause:1
 ISO
 ShutterSpeed
-ExposureStops
 Pause:1

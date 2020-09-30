@@ -1,5 +1,9 @@
-SetLampBrightness:0
-LampOff
+On:1
+Pause:1
+DisableStrobe
+LampOn
+Pause:1
+SetLampBrightness:100
 Pause:1
 GetStatus:1
 Pause:1
