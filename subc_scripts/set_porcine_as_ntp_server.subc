@@ -1,10 +1,11 @@
-ConnectNTPServer:10.40.7.10
+ConnectNTPServer:192.168.13.5
 Pause:1
 SyncClock
 Pause:1
-SyncClock
+SyncClock 
 Pause:1
 AutoTime
 NtpServerAddress
 NtpConnectionStatus
 NtpClockDrift
+
