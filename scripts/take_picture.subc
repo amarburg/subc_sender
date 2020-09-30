@@ -1,5 +1,6 @@
 Device:0,Aquorea Mk3
 On:0
+On:1
 ImageFormat:RawSensor
 UpdateFocus:2.2
 Iso:50
@@ -8,3 +9,5 @@ FocusDistance
 GetVideoLog
 CanTakePicture
 TakePicture
+Off:0
+Off:1

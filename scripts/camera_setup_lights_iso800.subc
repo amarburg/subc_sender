@@ -1,0 +1,21 @@
+SyncClock
+Device:1,Aquorea Mk3
+On:0
+On:1
+LampBrightness:100
+ImageFormat:RawSensor
+ManualExposure
+Pause:1
+UpdateWhiteBalance:Manual
+UpdateR:2.2
+UpdateG:1.0
+UpdateB:1.7
+Pause:1
+UpdateISO:800
+UpdateShutterSpeed:16666667
+Compensate:0
+Pause:1
+ISO
+ShutterSpeed
+ExposureStops
+Pause:1
