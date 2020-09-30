@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DEST_DIR=/zvol1/aaron/subc_sync
+DEST_DIR=/zvol1/aaron/invader/subc_sync
 
 mkdir $DEST_DIR/left $DEST_DIR/right
 
