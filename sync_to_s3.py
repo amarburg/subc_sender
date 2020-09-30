@@ -25,7 +25,10 @@ def dng_to_png( dngpath, pngpath ):
 
     #cmd = ["convert", dngpath, pngpath]
 
-    cmd = ["rawtherapee-cli", "-s", "-b8", "-n", "-Y", "-c", dngpath, "-o", pngpath ]
+    ## Only relevant for PNGs
+    # "-b8", "-n",
+
+    cmd = ["rawtherapee-cli", "-s", "-Y", "-c", dngpath, "-o", pngpath ]
     logging.debug(cmd)
 
     convert_out = subprocess.run(cmd, capture_output=True)
@@ -61,7 +64,7 @@ def convert_and_upload( file, label ):
     cmd = ["cp", file, dngfile ]
     subprocess.run(cmd)
 
-    pngfile = dngfile.with_suffix(".png")
+    pngfile = dngfile.with_suffix(".jpg")
 
     dng_to_png( dngfile, pngfile )
 
@@ -133,10 +136,20 @@ class SubcEventHandler( FileSystemEventHandler ):
 
             convert_and_upload( pair.right, "right" )
 
+            ## Build composite
+
 
 if __name__ == '__main__':
 
+    logger = logging.getLogger(__name__)
     logging.basicConfig( level=logging.DEBUG )
+
+    ## Squelch boto-related logging output
+    for name in logging.Logger.manager.loggerDict.keys():
+        if ('boto' in name) or ('urllib3' in name) or ('s3transfer' in name) or ('boto3' in name) or ('botocore' in name) or ('nose' in name):
+            logging.info("Setting logger for %s to CRITICAL" % name)
+            logging.getLogger(name).setLevel(logging.CRITICAL)
+
 
     event_handler = SubcEventHandler()
 
