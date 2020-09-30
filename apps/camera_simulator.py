@@ -32,6 +32,12 @@ async def camera_simulator(reader, writer):
 
         try:
             await writer.drain()
+            data = await reader.read(255)
+
+            ## Drop length (for now)
+            data = data[4:].decode('ascii')
+
+            print("Received (%d): %s" % (len(data),data))
         except ConnectionResetError:
             break;
 

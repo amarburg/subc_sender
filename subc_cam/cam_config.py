@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+#
+# Configuration parameters which are used in multiple scripts.
+#
 
 import ipaddress
 
@@ -15,8 +18,15 @@ class CamConfig:
 def addDefaultArgs( parser ):
 
     parser.add_argument("--fake", action='store_true', help="Don't actually connect to cameras" )
-    parser.add_argument("--left", dest="left_ip", default="192.168.13.228")
-    parser.add_argument("--right", dest="right_ip", default="192.168.13.234")
+
+    ## Temporary values based on DHCP-assigned values on InVADER subnet
+    #parser.add_argument("--left", dest="left_ip", default="10.40.7.238")
+    #parser.add_argument("--right", dest="right_ip", default="10.40.7.237")
+
+    ## "Real" InVADER subnet values
+    parser.add_argument("--left", dest="left_ip", default="10.40.7.14")
+    parser.add_argument("--right", dest="right_ip", default="10.40.7.15")
+
     parser.add_argument("--left-port", type=int, default=8888)
     parser.add_argument("--right-port", type=int, default=8888)
 
