@@ -20,7 +20,8 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    left_cam = cam_config.CamConfig( ipaddress.ip_address(args.left_ip), port=args.left_port, name="LEFT" )
-    right_cam = cam_config.CamConfig( ipaddress.ip_address(args.right_ip), port=args.right_port, name="RIGHT" )
+#    left_cam = cam_config.CamConfig( ipaddress.ip_address(args.left_ip), port=args.left_port, name="LEFT" )
+#    right_cam = cam_config.CamConfig( ipaddress.ip_address(args.right_ip), port=args.right_port, name="RIGHT" )
+    cameras = cam_config.camsFromArgs( args )
 
-    asyncio.run( cam_listener.listen( [left_cam, right_cam] ) )
+    asyncio.run( cam_listener.listen( cameras ) )

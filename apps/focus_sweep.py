@@ -80,8 +80,8 @@ if __name__=="__main__":
 
     cam_config.addDefaultArgs( parser )
 
-    parser.add_argument("--pre-script", default="subc_scripts/camera_setup_iso50.subc", help="Script to run before taking pictures")
-    parser.add_argument("--post-script", default=None, help="Script to run after taking pictures")
+    parser.add_argument("--pre-script", default="subc_scripts/pre_picture.subc", help="Script to run before taking pictures")
+    parser.add_argument("--post-script", default="subc_scripts/post_picture.subc", help="Script to run after taking pictures")
 
     parser.add_argument("--delay", default=2, type=int, help="Number of seconds to delay before taking picture" )
     parser.add_argument("--pause", default=5, type=int, help="Pause between images" )

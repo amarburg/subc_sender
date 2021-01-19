@@ -5,7 +5,7 @@ import logging
 
 import subc_cam
 from os import path
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,timezone
 from time import sleep
 
 import asyncio
@@ -36,7 +36,7 @@ async def take_pictures( cams, args ):
         repeat = 32767
 
     for i in range(0,repeat):
-        now = datetime.now()
+        now = datetime.now(tz=timezone.utc)
         picture_at = now+timedelta(seconds=args.delay)
 
         cmds = ["FocusDistance",
@@ -84,8 +84,8 @@ if __name__=="__main__":
 
     cam_config.addDefaultArgs( parser )
 
-    parser.add_argument("--pre-script", default="scripts/camera_setup_iso50.subc", help="Script to run before taking pictures")
-    parser.add_argument("--post-script", default="scripts/lights_off.subc", help="Script to run after taking pictures")
+    parser.add_argument("--pre-script", default="subc_scripts/pre_picture.subc", help="Script to run before taking pictures")
+    parser.add_argument("--post-script", default="subc_scripts/post_picture.subc", help="Script to run after taking pictures")
 
     parser.add_argument("--focus", default=None, type=float, help="Focus value to send to camera" )
 

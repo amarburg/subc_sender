@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Uploads files to http://invader-cameras.camhd.science/
+
 import os
 import time
 import boto3
@@ -18,8 +20,7 @@ from watchdog.observers.polling import PollingObserver
 from watchdog.events import FileSystemEventHandler
 
 left_paths = [ Path("/mnt/left_camera/Stills") ]
-
-right_path = Path("/mnt/right_camera/Stills")
+right_paths = [ Path("/mnt/right_camera/Stills"), Path("/mnt/right_camera/Stills_1") ]
 
 def dng_to_png( dngpath, pngpath ):
 
@@ -99,13 +100,18 @@ class SubcEventHandler( FileSystemEventHandler ):
         if newfile.suffix != ".dng":
             return
 
-        left_date = subc_file_to_datetime( newfile )
+        try:
+            left_date = subc_file_to_datetime( newfile )
+        except ValueError as err:
+            logging.warning("Unable to parse subc file name: %s" % err)
+            return
+
         logging.debug("   detected new left raw file %s with date %s" % (newfile, left_date) )
 
         # Look for matching right image
         ## restrict to images from today
         right_glob = "%04d.%d.%d*.dng" % (left_date.year, left_date.month, left_date.day)
-        right_files = right_path.glob(right_glob)
+        right_files = [f for f in p.glob(right_glob) for p in right_paths]
 
         pair = ImagePair(newfile)
 
@@ -157,6 +163,10 @@ if __name__ == '__main__':
     for p in left_paths:
         logging.debug("Watching %s" % p)
         observer.schedule(event_handler, str(p) )
+
+    # for p in right_paths:
+    #     logging.debug("Watching %s" % p)
+    #     observer.schedule(event_handler, str(p) )
 
     observer.start()
 

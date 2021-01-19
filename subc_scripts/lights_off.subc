@@ -1,11 +1,10 @@
-SetLampBrightness:0
+LampBrightness:0
+LaserBrightness:0
 LampOff
 Pause:1
+GetStatus:0
 GetStatus:1
 Pause:1
-GetProductSerialNumber
-Pause:1
 LampBrightness
-Pause:1
-ProductState
+LaserBrightness
 Pause:1
