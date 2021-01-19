@@ -57,29 +57,28 @@ def wait_until_readable( fname, timeout=10 ):
 
 def convert_and_upload( file, label ):
 
-    #with TemporaryDirectory() as td:
+    with TemporaryDirectory() as td:
+        dngfile = td / Path(file.name)
+        logging.debug("Copying %s to %s" % (file,dngfile))
 
-    dngfile = Path("/tmp") / Path(file.name)
-    logging.debug("Copying %s to %s" % (file,dngfile))
+        cmd = ["cp", file, dngfile ]
+        subprocess.run(cmd)
 
-    cmd = ["cp", file, dngfile ]
-    subprocess.run(cmd)
+        pngfile = dngfile.with_suffix(".jpg")
 
-    pngfile = dngfile.with_suffix(".jpg")
+        dng_to_png( dngfile, pngfile )
 
-    dng_to_png( dngfile, pngfile )
+        # Upload the file
+        s3_client = boto3.client('s3',endpoint_url = 'https://s3.us-west-1.wasabisys.com')
+        bucket = "nasa-invader-subc-cameras"
+        object_name = Path(label) / pngfile.name
 
-    # Upload the file
-    s3_client = boto3.client('s3',endpoint_url = 'https://s3.us-west-1.wasabisys.com')
-    bucket = "nasa-invader-subc-cameras"
-    object_name = Path(label) / pngfile.name
-
-    try:
-        response = s3_client.upload_file( str(pngfile), bucket, str(object_name) )
-    except ClientError as e:
-        logging.error(e)
-        return False
-    return True
+        try:
+            response = s3_client.upload_file( str(pngfile), bucket, str(object_name) )
+        except ClientError as e:
+            logging.error(e)
+            return False
+        return True
 
 
 class ImagePair:
@@ -111,7 +110,9 @@ class SubcEventHandler( FileSystemEventHandler ):
         # Look for matching right image
         ## restrict to images from today
         right_glob = "%04d.%d.%d*.dng" % (left_date.year, left_date.month, left_date.day)
-        right_files = [f for f in p.glob(right_glob) for p in right_paths]
+
+        right_files = [p.glob(right_glob) for p in right_paths]
+        right_files = [f for p in right_files for f in p]
 
         pair = ImagePair(newfile)
 
@@ -120,7 +121,7 @@ class SubcEventHandler( FileSystemEventHandler ):
             right_date = subc_file_to_datetime( right_file )
 
             if abs(right_date - left_date) < timedelta(seconds=1):
-                logging.info("Found matching rightfile %s" %right_file)
+                logging.info("Found matching rightfile %s" % right_file)
 
                 pair.right = right_file
                 break
