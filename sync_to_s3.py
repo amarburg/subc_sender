@@ -9,12 +9,14 @@ from botocore.exceptions import ClientError
 from PIL import Image
 import logging
 from tempfile import TemporaryDirectory
-import subprocess
 import re
 import shutil
+import subprocess
 
 from pathlib import Path
 from datetime import datetime, timedelta
+
+from subc_postprocessing import filenames, raw
 
 from watchdog.observers.polling import PollingObserver
 from watchdog.events import FileSystemEventHandler
@@ -22,24 +24,6 @@ from watchdog.events import FileSystemEventHandler
 left_paths = [ Path("/mnt/left_camera/Stills") ]
 right_paths = [ Path("/mnt/right_camera/Stills"), Path("/mnt/right_camera/Stills_1") ]
 
-def dng_to_png( dngpath, pngpath ):
-
-    #cmd = ["convert", dngpath, pngpath]
-
-    ## Only relevant for PNGs
-    # "-b8", "-n",
-
-    cmd = ["rawtherapee-cli", "-s", "-Y", "-c", dngpath, "-o", pngpath ]
-    logging.debug(cmd)
-
-    convert_out = subprocess.run(cmd, capture_output=True)
-    logging.info(convert_out.stdout.decode())
-
-def subc_file_to_datetime( filename ):
-    ## Isolate just the file name itself
-    filename = filename.name
-
-    return datetime.strptime(filename, "%Y.%m.%d %H.%M.%S.%f.dng")
 
 def wait_until_readable( fname, timeout=10 ):
     if timeout < 0:
@@ -58,23 +42,27 @@ def wait_until_readable( fname, timeout=10 ):
 def convert_and_upload( file, label ):
 
     with TemporaryDirectory() as td:
-        dngfile = td / Path(file.name)
+
+        dngfile = "/tmp/" / Path(file.name)
         logging.debug("Copying %s to %s" % (file,dngfile))
 
         cmd = ["cp", file, dngfile ]
         subprocess.run(cmd)
 
-        pngfile = dngfile.with_suffix(".jpg")
+        regfile = filenames.regularize_filename(dngfile)
+        logging.debug(regfile)
+        jpgfile = regfile.with_suffix(".jpg")
+        logging.debug("Converting %s to %s" % (dngfile,jpgfile))
 
-        dng_to_png( dngfile, pngfile )
+        raw.dng_to_jpg( dngfile, jpgfile )
 
         # Upload the file
         s3_client = boto3.client('s3',endpoint_url = 'https://s3.us-west-1.wasabisys.com')
         bucket = "nasa-invader-subc-cameras"
-        object_name = Path(label) / pngfile.name
+        object_name = Path(label) / jpgfile.name
 
         try:
-            response = s3_client.upload_file( str(pngfile), bucket, str(object_name) )
+            response = s3_client.upload_file( str(jpgfile), bucket, str(object_name) )
         except ClientError as e:
             logging.error(e)
             return False
@@ -100,7 +88,7 @@ class SubcEventHandler( FileSystemEventHandler ):
             return
 
         try:
-            left_date = subc_file_to_datetime( newfile )
+            left_date = filenames.subc_file_to_datetime( newfile )
         except ValueError as err:
             logging.warning("Unable to parse subc file name: %s" % err)
             return
@@ -118,7 +106,7 @@ class SubcEventHandler( FileSystemEventHandler ):
 
         for right_file in right_files:
 
-            right_date = subc_file_to_datetime( right_file )
+            right_date = filenames.subc_file_to_datetime( right_file )
 
             if abs(right_date - left_date) < timedelta(seconds=1):
                 logging.info("Found matching rightfile %s" % right_file)
